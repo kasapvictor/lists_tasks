@@ -1,8 +1,7 @@
 // @ts-check
-
-import '@testing-library/jest-dom';
 import fs from 'fs';
 import path from 'path';
+import '@testing-library/jest-dom';
 import testingLibraryDom from '@testing-library/dom';
 import testingLibraryUserEvent from '@testing-library/user-event';
 
