@@ -1,44 +1,10 @@
-const state = {
-  lists: [
-    {
-      id: 1,
-      name: 'General',
-    },
-    {
-      id: 2,
-      name: 'General2',
-    },
-  ],
-  tasks: [
-    {
-      listId: 1,
-      name: 'Task1',
-    },
-    {
-      listId: 1,
-      name: 'Task2',
-    },
-    {
-      listId: 2,
-      name: 'Task12',
-    },
-    {
-      listId: 2,
-      name: 'Task22',
-    },
-  ],
-  uiState: {
-    activeListId: 1,
-  },
-};
-
 const ucFirst = (str) => {
   if (!str) return str;
 
   return str[0].toUpperCase() + str.slice(1);
 };
 
-const listHandler = (e, render) => {
+const listHandler = (e, state, render) => {
   const el = e.target;
   const tag = el.tagName;
 
@@ -55,6 +21,7 @@ const listHandler = (e, render) => {
   const listItem = state.lists.filter((item) => item.name === name);
   const idListItem = listItem[0].id;
 
+  // eslint-disable-next-line no-param-reassign
   state.uiState.activeListId = idListItem;
   render();
 
@@ -86,7 +53,7 @@ const templateList = (type, items, activeId = null) => {
   return ul;
 };
 
-const render = () => {
+const render = (state) => {
   const { activeListId } = state.uiState;
 
   // LISTS
@@ -96,7 +63,7 @@ const render = () => {
 
   wrapLists.innerHTML = '';
   wrapLists.append(listsListHtml);
-  listsListHtml.addEventListener('click', (e) => listHandler(e, render));
+  listsListHtml.addEventListener('click', (e) => listHandler(e, state, render));
 
   // TASKS
   const wrapTasks = document.querySelector('[data-container="tasks"]');
@@ -109,7 +76,7 @@ const render = () => {
   wrapTasks.append(tasksListHtml);
 };
 
-const formHandler = (e, form) => {
+const formHandler = (e, form, state) => {
   e.preventDefault();
 
   const { container } = form.dataset;
@@ -121,6 +88,7 @@ const formHandler = (e, form) => {
 
   if (isList) {
     const id = state.lists.length + 1;
+    // eslint-disable-next-line no-param-reassign
     state[type] = [...state[type], {
       id,
       name,
@@ -129,23 +97,58 @@ const formHandler = (e, form) => {
 
   if (!isList) {
     const listId = state.uiState.activeListId;
-    state.tasks = [...state.tasks, {
+    // eslint-disable-next-line no-param-reassign
+    state[type] = [...state.tasks, {
       listId,
       name,
     }];
   }
 
   form.reset();
-  render();
+  render(state);
 };
 
 const app = () => {
+  const state = {
+    lists: [
+      {
+        id: 1,
+        name: 'General',
+      },
+      {
+        id: 2,
+        name: 'General2',
+      },
+    ],
+    tasks: [
+      {
+        listId: 1,
+        name: 'Task1',
+      },
+      {
+        listId: 1,
+        name: 'Task2',
+      },
+      {
+        listId: 2,
+        name: 'Task12',
+      },
+      {
+        listId: 2,
+        name: 'Task22',
+      },
+    ],
+    uiState: {
+      activeListId: 1,
+    },
+  };
+
   const forms = document.querySelectorAll('form');
 
   forms.forEach((form) => form.addEventListener('submit',
     (e) => formHandler(e, form, state)));
 
-  render();
+  render(state);
 };
 
 export default app;
