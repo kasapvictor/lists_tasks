@@ -10,7 +10,6 @@ const state = {
       id: 2,
       name: 'General2',
     },
-
   ],
   tasks: [
     {
@@ -31,7 +30,6 @@ const state = {
     },
   ],
   uiState: {
-    lastActiveId: 0,
     activeListId: 1,
   },
 };
@@ -42,7 +40,7 @@ const ucFirst = (str) => {
   return str[0].toUpperCase() + str.slice(1);
 };
 
-const listHandler = (e) => {
+const listHandler = (e, render) => {
   const el = e.target;
   const tag = el.tagName;
 
@@ -59,6 +57,8 @@ const listHandler = (e) => {
   const idListItem = listItem[0].id;
 
   state.uiState.activeListId = idListItem;
+
+  render();
   return true;
 };
 
@@ -70,13 +70,12 @@ const templateListItem = (name, link = false) => {
 };
 
 const templateList = (type, items, activeId = null) => {
-  const islist = type === 'lists';
+  const isLists = type === 'lists';
   const ul = document.createElement('ul');
-  const itemsHtml = items.map((name) => templateListItem(name, islist))
+  const itemsHtml = items.map((name) => templateListItem(name, isLists))
     .join('');
 
   ul.innerHTML = itemsHtml;
-  ul.addEventListener('click', (e) => listHandler(e, ul));
 
   if (activeId) {
     const id = activeId - 1;
@@ -89,7 +88,6 @@ const templateList = (type, items, activeId = null) => {
 };
 
 const render = () => {
-  const { lastActiveId } = state.uiState;
   const { activeListId } = state.uiState;
 
   // LISTS
@@ -99,20 +97,17 @@ const render = () => {
 
   wrapLists.innerHTML = '';
   wrapLists.append(listsListHtml);
+  listsListHtml.addEventListener('click', (e) => listHandler(e, render));
 
-  if (lastActiveId !== activeListId) {
-    // TASKS
-    const wrapTasks = document.querySelector('[data-container="tasks"]');
-    const tasksList = state.tasks
-      .filter((task) => task.listId === activeListId)
-      .map((task) => task.name);
-    const tasksListHtml = templateList('tasks', tasksList);
+  // TASKS
+  const wrapTasks = document.querySelector('[data-container="tasks"]');
+  const tasksList = state.tasks
+    .filter((task) => task.listId === activeListId)
+    .map((task) => task.name);
+  const tasksListHtml = templateList('tasks', tasksList);
 
-    wrapTasks.innerHTML = '';
-    wrapTasks.append(tasksListHtml);
-
-    state.uiState.lastActiveId = activeListId;
-  }
+  wrapTasks.innerHTML = '';
+  wrapTasks.append(tasksListHtml);
 };
 
 const formHandler = (e, form) => {
@@ -121,8 +116,6 @@ const formHandler = (e, form) => {
   const { container } = form.dataset;
   const isList = container.includes('list');
   const type = isList ? 'lists' : 'tasks';
-
-  console.log('type', type);
 
   const formData = new FormData(form);
   const name = formData.get('name');
@@ -145,14 +138,13 @@ const formHandler = (e, form) => {
 
   form.reset();
   render();
-
-  console.log(state);
 };
 
 const app = () => {
   const forms = document.querySelectorAll('form');
 
-  forms.forEach((form) => form.addEventListener('submit', (e) => formHandler(e, form, state)));
+  forms.forEach((form) => form.addEventListener('submit',
+    (e) => formHandler(e, form, state)));
 
   render();
 };
