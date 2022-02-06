@@ -1,1 +1,22 @@
-<div id="point"></div>
+<div class="container m-3">
+    <div class="row">
+        <div class="col-4">
+            <h3>Lists</h3>
+            <form class="form-inline" data-container="new-list-form">
+                <label for="new-list-name" class="sr-only">New list name</label>
+                <input type="text" id="new-list-name" class="form-control mr-2" name="name" required>
+                <input type="submit" class="btn btn-primary" value="Add List">
+            </form>
+            <div data-container="lists"></div>
+        </div>
+        <div class="col-4">
+            <h3>Tasks</h3>
+            <form class="form-inline" data-container="new-task-form">
+                <label for="new-task-name" class="sr-only">New task name</label>
+                <input type="text" id="new-task-name" class="form-control mr-2" name="name" required>
+                <input type="submit" class="btn btn-primary" value="Add Task">
+            </form>
+            <div data-container="tasks"></div>
+        </div>
+    </div>
+</div>

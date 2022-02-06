@@ -48,17 +48,18 @@ const listHandler = (e, render) => {
     return false;
   }
 
-  const hash = el.hash.replace('#', '')
-    .split('_');
-  const name = hash.map((item) => ucFirst(item))
+  const name = el.hash
+    .replace('#', '')
+    .split('_')
+    .map((item) => ucFirst(item))
     .join(' ');
 
   const listItem = state.lists.filter((item) => item.name === name);
   const idListItem = listItem[0].id;
 
   state.uiState.activeListId = idListItem;
-
   render();
+
   return true;
 };
 
@@ -150,4 +151,3 @@ const app = () => {
 };
 
 export default app;
-//
