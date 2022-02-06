@@ -23,7 +23,7 @@ const listHandler = (e, state, render) => {
 
   // eslint-disable-next-line no-param-reassign
   state.uiState.activeListId = idListItem;
-  render();
+  render(state);
 
   return true;
 };
@@ -40,6 +40,8 @@ const templateList = (type, items, activeId = null) => {
   const ul = document.createElement('ul');
   const itemsHtml = items.map((name) => templateListItem(name, isLists))
     .join('');
+
+  if (!itemsHtml) return false;
 
   ul.innerHTML = itemsHtml;
 
@@ -73,7 +75,9 @@ const render = (state) => {
   const tasksListHtml = templateList('tasks', tasksList);
 
   wrapTasks.innerHTML = '';
-  wrapTasks.append(tasksListHtml);
+  if (tasksListHtml) {
+    wrapTasks.append(tasksListHtml);
+  }
 };
 
 const formHandler = (e, form, state) => {
@@ -115,29 +119,8 @@ const app = () => {
         id: 1,
         name: 'General',
       },
-      {
-        id: 2,
-        name: 'General2',
-      },
     ],
-    tasks: [
-      {
-        listId: 1,
-        name: 'Task1',
-      },
-      {
-        listId: 1,
-        name: 'Task2',
-      },
-      {
-        listId: 2,
-        name: 'Task12',
-      },
-      {
-        listId: 2,
-        name: 'Task22',
-      },
-    ],
+    tasks: [],
     uiState: {
       activeListId: 1,
     },

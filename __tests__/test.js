@@ -1,17 +1,19 @@
 // @ts-check
 import fs from 'fs';
 import path from 'path';
-import '@testing-library/jest-dom';
-import testingLibraryDom from '@testing-library/dom';
-import testingLibraryUserEvent from '@testing-library/user-event';
-
 import run from '../src/app.js';
+// import '@testing-library/jest-dom';
+// import testingLibraryDom from '@testing-library/dom';
+// import testingLibraryUserEvent from '@testing-library/user-event';
+require('@testing-library/jest-dom');
+const testingLibraryDom = require('@testing-library/dom');
+const testingLibraryUserEvent = require('@testing-library/user-event');
 
 const { screen } = testingLibraryDom;
 const userEvent = testingLibraryUserEvent.default;
 
 beforeEach(() => {
-  const initHtml = fs.readFileSync(path.join('__fixtures__', 'index.html')).toString();
+  const initHtml = fs.readFileSync(path.join('__tests__/__fixtures__', 'index.html')).toString();
   document.body.innerHTML = initHtml;
   run();
 });
