@@ -1,10 +1,6 @@
-const ucFirst = (str) => {
-  if (!str) return str;
+import _ from 'lodash';
 
-  return str[0].toUpperCase() + str.slice(1);
-};
-
-const listHandler = (e, state, render) => {
+const listHandler = (e, state, renderLists, renderTasks) => {
   const el = e.target;
   const tag = el.tagName;
 
@@ -15,15 +11,18 @@ const listHandler = (e, state, render) => {
   const name = el.hash
     .replace('#', '')
     .split('_')
-    .map((item) => ucFirst(item))
+    .map((item) => item.toLowerCase())
     .join(' ');
 
-  const listItem = state.lists.filter((item) => item.name === name);
+  const listItem = state.lists.filter(
+    (item) => decodeURI(item.name.toLowerCase()) === decodeURI(name),
+  );
   const idListItem = listItem[0].id;
 
   // eslint-disable-next-line no-param-reassign
   state.uiState.activeListId = idListItem;
-  render(state);
+  renderLists(state);
+  renderTasks(state);
 
   return true;
 };
@@ -55,19 +54,9 @@ const templateList = (type, items, activeId = null) => {
   return ul;
 };
 
-const render = (state) => {
+const renderTasks = (state) => {
   const { activeListId } = state.uiState;
 
-  // LISTS
-  const wrapLists = document.querySelector('[data-container="lists"]');
-  const listsList = state.lists.map((item) => item.name);
-  const listsListHtml = templateList('lists', listsList, activeListId);
-
-  wrapLists.innerHTML = '';
-  wrapLists.append(listsListHtml);
-  listsListHtml.addEventListener('click', (e) => listHandler(e, state, render));
-
-  // TASKS
   const wrapTasks = document.querySelector('[data-container="tasks"]');
   const tasksList = state.tasks
     .filter((task) => task.listId === activeListId)
@@ -78,6 +67,21 @@ const render = (state) => {
   if (tasksListHtml) {
     wrapTasks.append(tasksListHtml);
   }
+};
+
+const renderLists = (state) => {
+  const { activeListId } = state.uiState;
+
+  const wrapLists = document.querySelector('[data-container="lists"]');
+  const listsList = state.lists.map((item) => item.name);
+  const listsListHtml = templateList('lists', listsList, activeListId);
+
+  wrapLists.innerHTML = '';
+  wrapLists.append(listsListHtml);
+  listsListHtml.addEventListener(
+    'click',
+    (e) => listHandler(e, state, renderLists, renderTasks),
+  );
 };
 
 const formHandler = (e, form, state) => {
@@ -92,6 +96,10 @@ const formHandler = (e, form, state) => {
 
   if (isList) {
     const id = state.lists.length + 1;
+    const isExist = state.lists.find((item) => item.name === name);
+
+    if (isExist) return;
+
     // eslint-disable-next-line no-param-reassign
     state[type] = [...state[type], {
       id,
@@ -109,7 +117,8 @@ const formHandler = (e, form, state) => {
   }
 
   form.reset();
-  render(state);
+  renderLists(state);
+  renderTasks(state);
 };
 
 const app = () => {
@@ -131,7 +140,8 @@ const app = () => {
   forms.forEach((form) => form.addEventListener('submit',
     (e) => formHandler(e, form, state)));
 
-  render(state);
+  renderLists(state);
+  renderTasks(state);
 };
 
 export default app;
